@@ -9,11 +9,39 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-
-- task: Docker@2
-  inputs:
-    containerRegistry: 'ACR'
-    repository: 'expressjs'
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
+stages:
+  - stage: Build
+    displayName: Build Image
+    jobs:
+    - job: Build
+      displayName: Docker Build
+      pool:
+        vmImage: windows-latest
+        name: Default
+      steps:
+       - task: Docker@2
+         inputs:
+          containerRegistry: 'ACR'
+          repository: 'expressjs'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
+  - stage: Deploy
+    displayName: Deploy to AKS
+    jobs:
+      - job: Deploy
+        displayName: Deploy to AKS
+        pool: 
+          vmImage: windows-latest
+          name: Default
+        steps:
+        - task: KubernetesManifest@0
+          inputs:
+            action: 'deploy'
+            kubernetesServiceConnection: 'AKS'
+            namespace: 'default'
+            manifests: |
+              manifests/deployment.yml
+              manifests/ingress.yml
+              manifests/service.yml
+            imagePullSecrets: 'coflo-secret'
+            containers: 'coflo.azurecr.io/expressjs:$(Build.BuildId)'
