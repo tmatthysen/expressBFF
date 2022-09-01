@@ -1,0 +1,21 @@
+{
+  "name": "bff",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "dev": " nodemon server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongoose": "*",
+    "cors": "*",
+    "body-parser": "*"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
